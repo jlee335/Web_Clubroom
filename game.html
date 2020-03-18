@@ -1,106 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="js/phaser.min.js"></script>
+    <title>웹동방</title>
 </head>
 <body>
-
-    <script>
-
-    /*
-	
-	<<CLIENT>>
-
-	Game Backend(simple)
-
-	Client -> Server
-		Character movement keys (WASD)  --> do first
-		Chatting
-		Sound?
-		
-
-	Server -> Client
-		Character movement 		
-
-    */
-
-    /*
-	Try to configure screen size by getting information about the device.
-    */
-
-
-    var config = {
-        type: Phaser.AUTO,
-        width: 800,
-        height: 600,
-        physics: {
-            default: 'arcade',
-            arcade: {
-                gravity: { y: 200 }
-            }
-        },
-        scene: {
-            preload: preload,
-            create: create
-        }
-    };
-
-    var game = new Phaser.Game(config);
-
-    function preload ()
-    {
-    	/*
-		Preload phase :: from web server, bring essential textures from web server.
-		-> Textures
-		-> Map Status
-
-    	*/
-
-        this.load.setBaseURL('http://labs.phaser.io');
-
-        this.load.image('sky', 'assets/skies/space3.png');
-        this.load.image('logo', 'assets/sprites/phaser3-logo.png');
-        this.load.image('red', 'assets/particles/red.png');
-    }
-
-    function create ()
-    {
-    	/*
-		Game Initialization Phase::
-		-> All updates of map will happen in server
-
-    	*/
-
-        this.add.image(400, 300, 'sky');
-
-        /*
-		Particle Making setup
-        */
-        var particles = this.add.particles('red');
-        var emitter = particles.createEmitter({
-            speed: 100,
-            scale: { start: 1, end: 0 },
-            blendMode: 'ADD'
-        });
-
-
-        /*
-		Logo added as Physics Object
-        */
-        var logo = this.physics.add.image(400, 100, 'logo');
-
-        logo.setVelocity(100, 200);
-        logo.setBounce(1, 1);
-        logo.setCollideWorldBounds(true);
-
-
-        emitter.startFollow(logo);
-    }
-    function update()
-    {
-
-    }
-    </script>
-
+    <div id='game'></div>
 </body>
+<script src="js/game.js" type="text/javascript"></script>
+<script src="js/main.js" type="text/javascript"></script>
+<script src="js/client.js" type="text/javascript"></script>
 </html>

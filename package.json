@@ -1,0 +1,24 @@
+{
+  "name": "web_clubroom",
+  "version": "1.0.0",
+  "description": "This is a simple online 2D game for isolated club members due to school closedown :(",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jlee335/Web_Clubroom.git"
+  },
+  "author": "Hyunjae Lee",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jlee335/Web_Clubroom/issues"
+  },
+  "homepage": "https://github.com/jlee335/Web_Clubroom#readme",
+  "dependencies": {
+    "express": "^4.15.2",
+    "socket.io": "^1.7.3"
+  }
+}
