@@ -41,9 +41,9 @@ Client.socket.on('allplayers',function(data,myid){
     //Periodic Update Function to synchronize with Server
     setInterval(function(){
         //1. Recieve current info about player
-        
+        var myPlayer = Game.myPlayer();
         //2. Organize and send info to server
-        Client.socket.emit('update',myid); 
+        Client.socket.emit('update',myid,myPlayer); //.x .y 
     }, 1000);
 
 });

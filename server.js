@@ -52,8 +52,9 @@ io.on('connection',function(socket){
         console.log('test received');
     });
 
-    socket.on('update',function(player_updated){
-        
+    socket.on('update',function(update_id,player_updated){
+        if(DEBUG) console.log('update:'+update_id + " {x: " + player_updated.x + " y: "+player_updated.y+"}");
+        if(player_updated) players.set(player_updated.id,player_updated); // update the existing map of server.
     });
 });
 

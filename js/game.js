@@ -13,7 +13,21 @@ var UI_Layer;
 
 var myID = -1;
 
-
+// Player 클래스를 대충 정의. Client.js로 플레이어 정보를 보낼 때 여기서 포장해서 보냄
+// 게임에 기능을 추가할 경우, Class 의 Entries 를 추가해보자 
+// 만약 게임이 복잡해지면 따로 classes.js 만들어서 html 어 먼저 loading 시키자..?
+//-----------------------------------------------------------------
+// x,y 맵상 좌표
+// List of Items (예정) (아이템 ID 의 리스트로 만들면 어떨까)
+// Current Action (예정) (이동중, 대화중, 뭐뭐중....)
+// Clothing (예정)
+ 
+class Player {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+};
 
 Game.init = function(){
     game.stage.disableVisibilityChange = true;
@@ -54,6 +68,17 @@ Game.setID = function(id){
     myID = id;
     //DebugText.setText('your id is: ' + myID);
 };
+
+Game.myPlayer = function(){
+    var thisplayer = new Player(Game.playerMap[myID].x,Game.playerMap[myID].y);
+    //var thisplayer = new Player(10,10);
+
+    if(myID != -1){
+        return thisplayer;
+    }else{
+        return null;
+    }
+}
 
 Game.getCoordinates = function(layer,pointer){
     Client.sendClick(pointer.worldX,pointer.worldY);
