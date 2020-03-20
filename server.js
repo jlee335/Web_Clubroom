@@ -17,6 +17,11 @@ server.listen(process.env.PORT || 8081,function(){
     console.log('Listening on '+server.address().port);
 });
 
+let players = new Map(); //Key-Value map of all players and their IDs.
+
+var DEBUG = true;
+
+
 io.on('connection',function(socket){
 
     socket.on('newplayer',function(){
@@ -25,15 +30,18 @@ io.on('connection',function(socket){
             x: randomInt(100,400),
             y: randomInt(100,400)
         };
-        socket.emit('allplayers',getAllPlayers());
+        socket.emit('allplayers',getAllPlayers(),socket.player.id); //returns full list of players and your Unique ID
         socket.broadcast.emit('newplayer',socket.player);
 
         socket.on('click',function(data){
-            console.log('click to '+data.x+', '+data.y);
+            console.log('CLICK '+ socket.player.id + '  {'+data.x+', '+data.y+'}');
             socket.player.x = data.x;
             socket.player.y = data.y;
             io.emit('move',socket.player);
+
         });
+
+        //Server periodically collects player STATE and POSITION
 
         socket.on('disconnect',function(){
             io.emit('remove',socket.player.id);
@@ -43,15 +51,32 @@ io.on('connection',function(socket){
     socket.on('test',function(){
         console.log('test received');
     });
+
+    socket.on('update',function(player_updated){
+        
+    });
 });
 
-function getAllPlayers(){
-    var players = [];
+
+
+function update_Player(){
     Object.keys(io.sockets.connected).forEach(function(socketID){
         var player = io.sockets.connected[socketID].player;
-        if(player) players.push(player);
+        if(player) players.set(player.id,player);
+        if(player && DEBUG) console.log("updated: "+player.id);
     });
-    return players;
+}
+
+function getAllPlayers(){
+    update_Player();
+    // returns a list. I should 
+    var playersList = [];
+
+    for (let [key,value] of players.entries()){
+        playersList.push(value); //Extract all players from server data map
+    }
+    if(DEBUG) console.log("GAPGAP: "+playersList.length + " pl len:" + players.size)
+    return playersList;
 }
 
 function randomInt (low, high) {
