@@ -13,6 +13,9 @@ app.get('/',function(req,res){
 
 server.lastPlayderID = 0;
 
+/*
+    서버 여는것. Port 에서 요청들이 들어오면 그것을 처리하는 방식
+*/
 server.listen(process.env.PORT || 8081,function(){
     console.log('Listening on '+server.address().port);
 });
@@ -21,21 +24,36 @@ let players = new Map(); //Key-Value map of all players and their IDs.
 
 var DEBUG = true;
 
+/*
+Socket.io 사용한다
 
-io.on('connection',function(socket){
+플레이어가 서버랑 접촉을 하면, 그 connection 을 socket 이라는 구조로 저장한다.
+즉, 1 플레이어 1 socket 구조를 가지고 있다.
 
+*/
+
+
+io.on('connection',function(socket){ //socket.io 통해서 연결이 되었을때 event 다. 1플레이어 접속이라는 뜻.
+
+/*
+client 가 서버에게 새 플레이어가 로그인 (게임 접속) 했다고 알림
+1 socket, 1 player 이므로, 
+*/
     socket.on('newplayer',function(){
+
+        //socket 에다가 player class 만들어주자
         socket.player = {
             id: server.lastPlayderID++,
             x: randomInt(100,400),
             y: randomInt(100,400)
         };
+        
         socket.emit('allplayers',getAllPlayers(),socket.player.id); //returns full list of players and your Unique ID
         socket.broadcast.emit('newplayer',socket.player);
 
-        socket.on('click',function(data){
+        socket.on('click',function(data){ // 서버에서 "클릭" 요청을 받았을 때 플레이어 위치 업데이트 **FIXME
             console.log('CLICK '+ socket.player.id + '  {'+data.x+', '+data.y+'}');
-            socket.player.x = data.x;
+            socket.player.x = data.x; //socket 데이터 업데이트
             socket.player.y = data.y;
             io.emit('move',socket.player);
 
@@ -60,8 +78,14 @@ io.on('connection',function(socket){
 
 
 
+
+/*
+    players 라는 Map<id,player class> 가 존재한다.
+    
+    모든 플레이어 정보를 한번에 업데이트하는 함수다
+*/
 function update_Player(){
-    Object.keys(io.sockets.connected).forEach(function(socketID){
+    Object.keys(io.sockets.connected).forEach(function(socketID){ //socket 들을 for loop 해서 socket 정보 player 에게 준다.
         var player = io.sockets.connected[socketID].player;
         if(player) players.set(player.id,player);
         if(player && DEBUG) console.log("updated: "+player.id);
@@ -76,7 +100,7 @@ function getAllPlayers(){
     for (let [key,value] of players.entries()){
         playersList.push(value); //Extract all players from server data map
     }
-    if(DEBUG) console.log("GAPGAP: "+playersList.length + " pl len:" + players.size)
+    if(DEBUG) console.log("getAllPlayers() : playerlist_length: "+playersList.length + " players.length:" + players.size)
     return playersList;
 }
 
