@@ -51,11 +51,15 @@ client 가 서버에게 새 플레이어가 로그인 (게임 접속) 했다고 
         socket.emit('allplayers',getAllPlayers(),socket.player.id); //returns full list of players and your Unique ID
         socket.broadcast.emit('newplayer',socket.player);
 
-        socket.on('click',function(data){ // 서버에서 "클릭" 요청을 받았을 때 플레이어 위치 업데이트 **FIXME
+        socket.on('click',function(data,player,time){ // 서버에서 "클릭" 요청을 받았을 때 플레이어 위치 업데이트 **FIXME
             console.log('CLICK '+ socket.player.id + '  {'+data.x+', '+data.y+'}');
-            socket.player.x = data.x; //socket 데이터 업데이트
-            socket.player.y = data.y;
-            io.emit('move',socket.player);
+
+            //클라이언트가 보낸 현 위치로 서버 현 위치 업데이트 (의미 있을지는 모르겠다)
+            socket.player.x = player.x; 
+            socket.player.y = player.y;
+            
+
+            io.emit('move',socket.player,time);
 
         });
 

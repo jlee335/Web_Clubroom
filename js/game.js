@@ -95,7 +95,7 @@ Game.setID = function(id){
 //client 가 game 한테서 호출하는 함수임.
 Game.myPlayer = function(){
     var thisplayer = new Player(Game.playerMap[myID].x,Game.playerMap[myID].y);
-
+    
     if(myID != -1){
         return thisplayer;
     }else{

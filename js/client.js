@@ -27,9 +27,15 @@ Client.askNewPlayer = function(){
 /*
 플레이어가 클릭한 곳을 서버로 보낸다. 서버가 알아서 이를 처리한다.
 
+Data to send::
+    -> 명령을 보낸 시간 (timestamp)
+    -> 해당 플레이어의 현 위치 
+    -> 목적지 
 */
 Client.sendClick = function(x,y){
-  Client.socket.emit('click',{x:x,y:y}); //data from server denotes this map {x:x y:y}
+    var time = Date.now();
+    var myPlayer = Game.myPlayer();
+    Client.socket.emit('click',{x:x,y:y},myPlayer,time); //data from server denotes this map {x:x y:y}
 };
 
 Client.socket.on('newplayer',function(data){
@@ -52,10 +58,15 @@ Client.socket.on('allplayers',function(data,myid){
     }
     Game.setID(myid);//내 UID 를 게임에 알려준다
 
-    Client.socket.on('move',function(data){
-        //Client may get delayed response if player not active.
+    Client.socket.on('move',function(player,ordertime){
+        //1. Interpolation 실행
+        var nowtime = Date.now();
         
-        Game.movePlayer(data.id,data.x,data.y); // 다른 플레이어가 move 명령을 받을 때 client 에서도 적용
+        var diff = nowtime - ordertime;
+        
+        //2. move 명령 실행
+        
+        Game.movePlayer(player.id,player.x,player.y); // 다른 플레이어가 move 명령을 받을 때 client 에서도 적용
     });
 
     Client.socket.on('remove',function(id){ //다른 플레이어가 로그아웃 했을 때 적용하자
