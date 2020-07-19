@@ -58,15 +58,12 @@ Client.socket.on('allplayers',function(data,myid){
     }
     Game.setID(myid);//내 UID 를 게임에 알려준다
 
-    Client.socket.on('move',function(player,ordertime){
+    Client.socket.on('move',function(player,x,y,ordertime){
         //1. Interpolation 실행
-        var nowtime = Date.now();
-        
-        var diff = nowtime - ordertime;
-        
+                
         //2. move 명령 실행
         
-        Game.movePlayer(player.id,player.x,player.y); // 다른 플레이어가 move 명령을 받을 때 client 에서도 적용
+        Game.movePlayer(player.id,x,y,ordertime); // 다른 플레이어가 move 명령을 받을 때 client 에서도 적용
     });
 
     Client.socket.on('remove',function(id){ //다른 플레이어가 로그아웃 했을 때 적용하자

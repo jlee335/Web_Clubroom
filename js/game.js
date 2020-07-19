@@ -115,11 +115,22 @@ Game.addNewPlayer = function(id,x,y){
 };
 
 //game <-- client <-- server(from here)
-Game.movePlayer = function(id,x,y){
+Game.movePlayer = function(id,x,y,ordertime){
     var player = Game.playerMap[id];
     var distance = Phaser.Math.distance(player.x,player.y,x,y);
     var tween = game.add.tween(player);
     var duration = distance*10;
+
+    var nowtime = Date.now();
+    var diff = nowtime - ordertime;
+    
+    var dx = x - player.x;
+    var dy = y - player.y;
+
+    //position moderation from server lag time
+    player.x = player.x + dx*(diff/duration);
+    player.y = player.y + dy*(diff/duration);
+
     tween.to({x:x,y:y}, duration);
     tween.start();
 };

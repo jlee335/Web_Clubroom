@@ -59,7 +59,7 @@ client 가 서버에게 새 플레이어가 로그인 (게임 접속) 했다고 
             socket.player.y = player.y;
             
 
-            io.emit('move',socket.player,time);
+            io.emit('move',socket.player,data.x,data.y,time);
 
         });
 
