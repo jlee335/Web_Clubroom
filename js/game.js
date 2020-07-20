@@ -121,16 +121,20 @@ Game.movePlayer = function(id,x,y,ordertime){
     var tween = game.add.tween(player);
     var duration = distance*10;
 
+    /* Method of Lag-time compensation */
+
     var nowtime = Date.now();
     var diff = nowtime - ordertime;
     
     var dx = x - player.x;
     var dy = y - player.y;
 
-    //position moderation from server lag time
     player.x = player.x + dx*(diff/duration);
     player.y = player.y + dy*(diff/duration);
 
+    //////////////////////////////////////
+
+    //movement animation from modified startpoint
     tween.to({x:x,y:y}, duration);
     tween.start();
 };
