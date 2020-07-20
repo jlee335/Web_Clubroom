@@ -95,7 +95,7 @@ Game.setID = function(id){
 //client 가 game 한테서 호출하는 함수임.
 Game.myPlayer = function(){
     var thisplayer = new Player(Game.playerMap[myID].x,Game.playerMap[myID].y);
-
+    
     if(myID != -1){
         return thisplayer;
     }else{
@@ -115,11 +115,26 @@ Game.addNewPlayer = function(id,x,y){
 };
 
 //game <-- client <-- server(from here)
-Game.movePlayer = function(id,x,y){
+Game.movePlayer = function(id,x,y,ordertime){
     var player = Game.playerMap[id];
     var distance = Phaser.Math.distance(player.x,player.y,x,y);
     var tween = game.add.tween(player);
     var duration = distance*10;
+
+    /* Method of Lag-time compensation */
+
+    var nowtime = Date.now();
+    var diff = nowtime - ordertime;
+    
+    var dx = x - player.x;
+    var dy = y - player.y;
+
+    player.x = player.x + dx*(diff/duration);
+    player.y = player.y + dy*(diff/duration);
+
+    //////////////////////////////////////
+
+    //movement animation from modified startpoint
     tween.to({x:x,y:y}, duration);
     tween.start();
 };
