@@ -29,11 +29,25 @@ var myID = -1;
 // Clothing (예정)
 //-----------------------------------------------------------------
 
- 
+/*
+javascript doesn't support enumerations.....
+    state: 
+        0 = IDLE
+        1 = MOVING
+        2 = TALKING (?)
+
+    destX destY allows resumed movement of player
+    by getting server status after game engine pause. Missed orders..
+
+*/
+
 class Player {
   constructor(x, y) {
     this.x = x;
     this.y = y;
+    this.state = 0;
+    this.destX = 0;
+    this.destY = 0;
   }
 };
 
@@ -114,6 +128,42 @@ Game.addNewPlayer = function(id,x,y){
     DebugText.setText('AddSprite ' + id);
 };
 
+function end_movement(id) {
+    var player = Game.playerMap[id];
+    player.destX = 0;
+    player.destY = 0;
+    player.state = 0; //idle 로 다시 지정
+}
+
+/*
+Player Movement Scheme
+
+1. 
+Game.getCoordinates
+--> Client.sendClick
+--> socket.on('click')  (server)
+--> socket.emit('move') (server)
+--> socket.on(move) (client)
+--> Game.movePlayer
+
+*** I will generalize this from just movement to general player status ***
+
+--> Client.sendState (Player 객체)
+--> socket.on('sendstate')      (server 내 state 교체)
+--> socket.emit('changestate')  (player state 교체 apply all)
+
+--> Game.changeState
+        1. player 객체 확인해서 차이점 분석
+        * IDLE      -> MOVING   :: movePlayer 처럼 진행, TELEPORT + set dest + tween
+        * MOVING    -> IDLE     :: xy teleport and change to IDLE
+        * IDLE      -> IDLE     :: TELEPORT
+        * MOVING    -> MOVING   :: TELEPORT + set dest + tween
+
+
+
+*/
+
+
 //game <-- client <-- server(from here)
 Game.movePlayer = function(id,x,y,ordertime){
     var player = Game.playerMap[id];
@@ -134,10 +184,19 @@ Game.movePlayer = function(id,x,y,ordertime){
 
     //////////////////////////////////////
 
+    /* Changing player status */
+    player.destX = x;
+    player.destY = y;
+    player.status = 1; //Moving
+    ////////////////////////////
+
     //movement animation from modified startpoint
     tween.to({x:x,y:y}, duration);
+    tween.onComplete.add(end_movement(id), this); //change player state after completing tween
     tween.start();
 };
+
+
 
 //game <-- client <-- server(from here)
 Game.removePlayer = function(id){

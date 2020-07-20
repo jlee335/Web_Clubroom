@@ -90,6 +90,33 @@ Client.socket.on('allplayers',function(data,myid){
         //2. Organize and send info to server
         Client.socket.emit('update',myid,myPlayer); //.x .y 
     }, 1000);
+    
+    /* 
+
+    https://www.html5gamedevs.com/topic/37610-prevent-game-pause/
+
+    SyncRequest
+     
+    Phaser3 이용하는 Client 가 웹 브라우저 꺼져있을 동안 멈춰있을 가능성이 있다 
+        (탭 최소화, 등등)
+
+    멈추다 다시 시작하면, 서버의 최신 상태랑 같아야 한다. 
+
+    1. 멈추다 다시 시작한 경우 찾기
+        
+        Method 1: 서버에서 지속적으로 핑을 보내는데, 이것을 놓쳤을 경우
+                    ie) client 가 10 인데 server 가 이미 15 (1 차이 이상)
+    
+        Method 2: client 에서 100ms 마다 최신 시간 업데이트하는데,
+                    ie) now - prev 가 너무 클 때..
+
+        Method 3: 
+    
+    2. 서버에서 플레이어 상태 다시 받기
+
+    
+    
+    */
 
 });
 
