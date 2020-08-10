@@ -66,10 +66,13 @@ Game.preload = function() {
 Game.create = function(){
     Game.playerMap = {};
 
-    //아직은 의미없는 테스트 함수------------------------------------
-    var testKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
-    testKey.onDown.add(Client.sendTest, this);
-    //-------------------------------------------------------------
+    cursors = game.input.keyboard.createCursorKeys();
+
+    //	Enable p2 physics
+    game.physics.startSystem(Phaser.Physics.P2JS);
+    
+    //  Make things a bit more bouncey
+    game.physics.p2.defaultRestitution = 0.8;
 
     //Phaser 안에 tilemap 이라는 방법을 이용해서 게임 배경을 만들어준다.
     var map = game.add.tilemap('map');
@@ -83,7 +86,7 @@ Game.create = function(){
 
     layer.inputEnabled = true; // Allows clicking on the map ; it's enough to do it on the last layer
 
-    layer.events.onInputUp.add(Game.getCoordinates, this); // Phaser 에서 "클릭" 했을 때에 행동!!!!!
+    //layer.events.onInputUp.add(Game.getCoordinates, this); // Phaser 에서 "클릭" 했을 때에 행동!!!!!
 
     //Phaser 에서 텍스트 아웃풋 만드는 과정
     DebugText = game.add.text(15, 15, "hii", {
@@ -99,8 +102,37 @@ Game.create = function(){
     서버에서 이를 처리해서 다른 Client 한테도 업데이트가 적용되는 구조다.
     */
     //game --> client ---> server
+
     Client.askNewPlayer(); 
 };
+
+Game.update = function (){
+    if(myID != -1){
+        sprite = Game.playerMap[myID];
+     
+        sprite.body.setZeroVelocity();
+
+        if (cursors.left.isDown)
+        {
+            sprite.body.moveLeft(400);
+        }
+        else if (cursors.right.isDown)
+        {
+            sprite.body.moveRight(400);
+        }
+
+        if (cursors.up.isDown)
+        {
+            sprite.body.moveUp(400);
+        }
+        else if (cursors.down.isDown)
+        {
+            sprite.body.moveDown(400);
+        }
+    }
+}
+
+
 
 Game.setID = function(id){
     myID = id;
@@ -125,6 +157,14 @@ Game.getCoordinates = function(layer,pointer){
 //game <-- client <-- server(from here)
 Game.addNewPlayer = function(id,x,y){
     Game.playerMap[id] = game.add.sprite(x,y,'sprite');
+
+    game.physics.p2.enable(Game.playerMap[id]);
+
+    //  Modify a few body properties
+    Game.playerMap[id].body.setZeroDamping();
+    Game.playerMap[id].body.fixedRotation = true;
+    
+    
     DebugText.setText('AddSprite ' + id);
 };
 
@@ -133,6 +173,7 @@ function end_movement(id) {
     player.destX = 0;
     player.destY = 0;
     player.state = 0; //idle 로 다시 지정
+    DebugText.setText('END MOVEMENT ' + id);
 }
 
 /*
@@ -192,7 +233,7 @@ Game.movePlayer = function(id,x,y,ordertime){
 
     //movement animation from modified startpoint
     tween.to({x:x,y:y}, duration);
-    tween.onComplete.add(end_movement(id), this); //change player state after completing tween
+    //tween.onComplete.add(end_movement(id), this); //change player state after completing tween
     tween.start();
 };
 
