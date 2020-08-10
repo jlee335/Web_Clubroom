@@ -66,7 +66,15 @@ Game.preload = function() {
 Game.create = function(){
     Game.playerMap = {};
 
-    cursors = game.input.keyboard.createCursorKeys();
+    //cursors = game.input.keyboard.createCursorKeys();
+    cursors = game.input.keyboard.addKeys(
+        {
+            up:     Phaser.KeyCode.W,
+            down:   Phaser.KeyCode.S,
+            left:   Phaser.KeyCode.A,
+            right:  Phaser.KeyCode.D
+        });
+
 
     //	Enable p2 physics
     game.physics.startSystem(Phaser.Physics.P2JS);
@@ -107,6 +115,9 @@ Game.create = function(){
 };
 
 Game.update = function (){
+    
+    
+
     if(myID != -1){
         sprite = Game.playerMap[myID];
      
